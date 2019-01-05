@@ -1,0 +1,18 @@
+{
+  "name": "is-standard-transaction",
+  "version": "1.0.0",
+  "description": "Determines given Bitcoin transaction is considered \"standard\" by bitcoind",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bitcoin",
+    "transaction"
+  ],
+  "author": "nao20010128nao",
+  "license": "MIT",
+  "dependencies": {
+    "bitcoinjs-lib": "^4.0.2"
+  }
+}
