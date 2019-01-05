@@ -33,7 +33,7 @@ const isStandardScript = (buf, params) => {
     if (buf.length == 0)
         return true;
     const type = classify.output(buf);
-    const decompiled = bitcoin.script.decompile(type);
+    const decompiled = bitcoin.script.decompile(buf);
     switch (type) {
         case classify.types.NULLDATA:
             const dataSize = decompiled[1].length;
@@ -68,9 +68,11 @@ const isStandardScript = (buf, params) => {
 const func = (tx, params) => {
     params = Object.assign({}, defaultParams, params);
     // Convert input param to Transaction object
-    // Accepts Buffer, Transaction
+    // Accepts Buffer, Transaction, string (in hex)
     if (tx instanceof Buffer) {
         tx = Transaction.fromBuffer(tx);
+    } else if (typeof tx === 'string') {
+        tx = Transaction.fromHex(tx);
     } else if (tx instanceof Transaction) {
         // pass
     } else {
@@ -85,7 +87,7 @@ const func = (tx, params) => {
             return SCRIPTSIG_SIZE;
         }
         // L110
-        if (!bitcoin.script.isPushOnly(txIn.script)) {
+        if (!bitcoin.script.isPushOnly(bitcoin.script.decompile(txIn.script))) {
             return SCRIPTSIG_NOT_PUSHONLY;
         }
     }

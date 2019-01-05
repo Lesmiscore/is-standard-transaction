@@ -4,7 +4,7 @@
   "description": "Determines given Bitcoin transaction is considered \"standard\" by bitcoind",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "keywords": [
     "bitcoin",
@@ -14,5 +14,9 @@
   "license": "MIT",
   "dependencies": {
     "bitcoinjs-lib": "^4.0.2"
+  },
+  "devDependencies": {
+    "assert": "^1.4.1",
+    "mocha": "^5.2.0"
   }
 }
