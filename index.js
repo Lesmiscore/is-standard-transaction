@@ -12,7 +12,8 @@ const defaultParams = Object.freeze({
     nulldataCount: 1,
     maxWeight: 400000,
     scriptSigSize: 1650,
-    dust: 0
+    dust: 0,
+    prevOutScript: []
 });
 
 const ILLEGAL_PARAM_OBJECT = "illegal-param-object";
@@ -81,14 +82,30 @@ const func = (tx, params) => {
     // L91
     if (tx.weight() > params.maxWeight)
         return TX_SIZE;
-    for (let txIn of tx.ins) {
+    for (let index in tx.ins) {
+        const txIn = tx.ins[index];
+        const decompiled = bitcoin.script.decompile(txIn.script);
         // L106
         if (txIn.script.length > params.scriptSigSize) {
             return SCRIPTSIG_SIZE;
         }
         // L110
-        if (!bitcoin.script.isPushOnly(bitcoin.script.decompile(txIn.script))) {
+        if (!bitcoin.script.isPushOnly(decompiled)) {
             return SCRIPTSIG_NOT_PUSHONLY;
+        }
+        // Extra: P2SH: last chunk needs to be tested (called redeemScript)
+        if (params.prevOutScript[index]) {
+            const type = classify.output(params.prevOutScript[index]);
+            if (type == classify.types.P2SH) {
+                if (!decompiled[decompiled.length - 1]) {
+                    return NONSTANDARD;
+                }
+                const issResult = isStandardScript(decompiled[decompiled.length - 1]);
+                if (!(typeof issResult === "boolean" && issResult)) {
+                    // non-standard
+                    return issResult;
+                }
+            }
         }
     }
     let nulls = 0;
